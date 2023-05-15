@@ -2,3 +2,4 @@ cosine_sim_desc.json
 cosine_similarity_genre.json
 matrix_desc.json
 matrix.json
+__pycache__
