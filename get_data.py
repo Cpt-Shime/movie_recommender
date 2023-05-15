@@ -8,7 +8,7 @@ API_KEY = "0a6734c048020b4e5c718fdfbb23fd21"
 
 
 # Broj stranica filmova
-NUM_MOVIES = 200
+NUM_MOVIES = 2
 
 # URL za API
 GENRE_URL = f"https://api.themoviedb.org/3/genre/movie/list?api_key={API_KEY}&language=en-US"
@@ -17,6 +17,7 @@ MOVIE_URL = f"https://api.themoviedb.org/3/discover/movie?api_key={API_KEY}&lang
 # Get Data
 genres_response = requests.get(GENRE_URL)
 genres_data = genres_response.json()
+
 
 # Znarove spajamo u jedan rijecnik
 genre_dict = {genre.get("id"): genre.get("name") for genre in genres_data.get("genres", [])}
@@ -49,10 +50,16 @@ for i in range(1, NUM_MOVIES):
             collection.insert_one(movie_data)
         else:
             # Ako je duplic onad preskoci
-            print(f"Skipping movie {movie.get('id')} ... already exists!")
+            print(f"Skipping movie {movie.get('id')} ... already in DB!")
+
+print("Calucating matrix now or you can run it by hand later")
+
+a = input("Do you want to calculate the cosine_sim_matrix now? yes/no")
+
+if (a!="no"):
+    #Calculate matrix 
+    cosine_sim_genre, cosine_sim_desc = recommender.compute()
+    recommender.store_matrices_locally(cosine_sim_genre, cosine_sim_desc)
+    print("Matrix created and store locally")
 
 
-
-#Calculate matrix
-cosine_sim_genre, cosine_sim_desc = recommender.compute()
-recommender.store_matrices_locally(cosine_sim_genre, cosine_sim_desc)

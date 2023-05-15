@@ -100,16 +100,25 @@ def load_matrices_from_database():
 
 
 def load_matrices_from_local():
-    """with open('matrix.json', 'r') as f:
+    try:
+        with open('cosine_similarity_genre.json', 'r') as f:
+            cosine_sim_genre = np.array(json.load(f))
+        with open('cosine_sim_desc.json', 'r') as f:
+            cosine_sim_desc = np.array(json.load(f))
+        return cosine_sim_genre, cosine_sim_desc
+    except FileNotFoundError:
+        print("Missing cosine sim matrix!")
+        print("To fix run compute_matrix.py!")
+        sys.exit()
+
+
+    """
+    with open('matrix.json', 'r') as f:
         tfidf_matrix = np.array(json.load(f))
     with open('matrix_desc.json', 'r') as f:
-        tfidf_matrix_desc = np.array(json.load(f))"""
-    with open('cosine_similarity_genre.json', 'r') as f:
-        cosine_sim_genre = np.array(json.load(f))
-    with open('cosine_sim_desc.json', 'r') as f:
-        cosine_sim_desc = np.array(json.load(f))
-
-    return cosine_sim_genre, cosine_sim_desc
+        tfidf_matrix_desc = np.array(json.load(f))
+    """
+    
 
 
 
@@ -117,18 +126,15 @@ def load_matrices_from_local():
 def get_recommendations(movies, cosine_sim_genre, cosine_sim_desc, title, start_index):
     #Ponadi index trazengo filma 
     idx = movies[movies['title'] == title].index[0]
-
     # Pronaci similarty rating sa tim filmom naspram ostalih
     sim_scores_genre = list(enumerate(cosine_sim_genre[idx]))
     sim_scores_desc = list(enumerate(cosine_sim_desc[idx]))
-
+    
     sim_scores = [(i, 0.7 * sim_scores_genre[i][1] + 0.3 * sim_scores_desc[i][1]) for i in range(len(sim_scores_genre))]
-
     sim_scores = sorted(sim_scores, key=lambda x: (x[1], x[1] * movies.loc[x[0], 'rating']), reverse=True)
 
     sim_scores = [(i, score) for (i, score) in sim_scores if i != idx]
     movie_indices = [i[0] for i in sim_scores[start_index:start_index+5]]
-
 
 
     return movies[['title', 'genre', 'rating']].iloc[movie_indices]
