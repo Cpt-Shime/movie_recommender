@@ -8,7 +8,7 @@ API_KEY = "0a6734c048020b4e5c718fdfbb23fd21"
 
 
 # Broj stranica filmova
-NUM_MOVIES = 2
+NUM_MOVIES = 300
 
 # URL za API
 GENRE_URL = f"https://api.themoviedb.org/3/genre/movie/list?api_key={API_KEY}&language=en-US"

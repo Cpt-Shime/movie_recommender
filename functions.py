@@ -56,14 +56,9 @@ def store_matrices( cosine_sim_genre, cosine_sim_desc):
     collection = db["matrices"] 
     collection.delete_many({})
 
-
-   # matrix_document = {"name": "tfidf_matrix", "matrix": matrix.toarray().tolist()}
-    #matrix_desc_document = {"name": "tfidf_matrix_description", "matrix": matrix_desc.toarray().tolist()}
     cosine_sim_genre_document = {"name": "cosine_similarity_genre", "matrix": cosine_sim_genre.tolist()}
     cosine_sim_desc_document = {"name": "cosine_similarity_description", "matrix": cosine_sim_desc.tolist()}
 
-    #collection.insert_one(matrix_document)
-   # collection.insert_one(matrix_desc_document)
     collection.insert_one(cosine_sim_genre_document)
     collection.insert_one(cosine_sim_desc_document)
 
@@ -72,11 +67,7 @@ def store_matrices( cosine_sim_genre, cosine_sim_desc):
 
 def store_matrices_locally(cosine_sim_genre, cosine_sim_desc):
     # Store the matrices in local files
-    """ with open('matrix.json', 'w') as f:
-        json.dump(matrix.toarray().tolist(), f)
-    with open('matrix_desc.json', 'w') as f:
-        json.dump(matrix_desc.toarray().tolist(), f)
-        """
+
     with open('cosine_similarity_genre.json', 'w') as f:
         json.dump(cosine_sim_genre.tolist(), f)
     with open('cosine_sim_desc.json', 'w') as f:
@@ -90,8 +81,6 @@ def load_matrices_from_database():
     db = client["movies_database"]
     collection = db["matrices"]
 
-   # matrix = collection.find_one({"name": "tfidf_matrix"})["matrix"]
-   # matrix_desc = collection.find_one({"name": "tfidf_matrix_description"})["matrix"]
     cosine_sim_genre = collection.find_one({"name": "cosine_similarity_genre"})["matrix"]
     cosine_sim_desc = collection.find_one({"name": "cosine_similarity_description"})["matrix"]
 
@@ -112,24 +101,21 @@ def load_matrices_from_local():
         sys.exit()
 
 
-    """
-    with open('matrix.json', 'r') as f:
-        tfidf_matrix = np.array(json.load(f))
-    with open('matrix_desc.json', 'r') as f:
-        tfidf_matrix_desc = np.array(json.load(f))
-    """
+
     
 
 
 
 
 def get_recommendations(movies, cosine_sim_genre, cosine_sim_desc, title, start_index):
+    
     #Ponadi index trazengo filma 
     idx = movies[movies['title'] == title].index[0]
+
     # Pronaci similarty rating sa tim filmom naspram ostalih
     sim_scores_genre = list(enumerate(cosine_sim_genre[idx]))
     sim_scores_desc = list(enumerate(cosine_sim_desc[idx]))
-    
+
     sim_scores = [(i, 0.7 * sim_scores_genre[i][1] + 0.3 * sim_scores_desc[i][1]) for i in range(len(sim_scores_genre))]
     sim_scores = sorted(sim_scores, key=lambda x: (x[1], x[1] * movies.loc[x[0], 'rating']), reverse=True)
 
